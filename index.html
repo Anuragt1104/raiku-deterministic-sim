@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Raiku Deterministic Slot Orchestrator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Raiku Deterministic Slot Orchestrator</h1>
+      <p class="subtitle">AOT/JIT reservations • App-defined ordering • Ackermann retries</p>
+    </header>
+
+    <section class="controls">
+      <div class="control-group">
+        <label>Mode</label>
+        <select id="mode">
+          <option value="aot">AOT (Reserve ahead)</option>
+          <option value="jit">JIT (Just-in-time)</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Tx Compute Units</label>
+        <input id="cu" type="number" min="100" step="100" value="2000" />
+      </div>
+      <div class="control-group">
+        <label>Deadline (slots from now)</label>
+        <input id="deadline" type="number" min="1" value="10" />
+      </div>
+      <div class="control-group">
+        <label>Priority</label>
+        <select id="priority">
+          <option value="low">Low</option>
+          <option value="medium" selected>Medium</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+      <div class="control-group">
+        <label>Group (ordering)</label>
+        <input id="group" type="text" value="DEX" />
+      </div>
+      <div class="control-group">
+        <label>Reserve at slot (AOT only)</label>
+        <input id="reserveSlot" type="number" min="0" value="5" />
+      </div>
+      <div class="control-group">
+        <button id="addTx">Add Tx</button>
+        <button id="burst">Add Burst (10)</button>
+        <button id="advance">Advance 1 Slot</button>
+        <button id="reset">Reset</button>
+      </div>
+      <div class="control-group toggles">
+        <label><input type="checkbox" id="mevSafe" checked /> MEV-safe group ordering</label>
+        <label><input type="checkbox" id="extLoad" /> External congestion (fill 50% each slot)</label>
+      </div>
+    </section>
+
+    <main>
+      <section class="metrics">
+        <div>Current slot: <span id="currentSlot">0</span></div>
+        <div>Backlog: <span id="backlog">0</span></div>
+        <div>Fill rate: <span id="fillRate">0%</span></div>
+        <div>Avg pre-conf latency: <span id="latency">—</span></div>
+        <div>Retries: <span id="retries">0</span></div>
+      </section>
+
+      <section>
+        <h2>Timeline (next 60 slots)</h2>
+        <div id="timeline" class="timeline"></div>
+      </section>
+
+      <section>
+        <h2>Transactions</h2>
+        <div id="txList" class="tx-list"></div>
+      </section>
+    </main>
+
+    <footer>
+      <a href="https://docs.raiku.com/" target="_blank" rel="noreferrer">Raiku Docs</a>
+      <span>•</span>
+      <a href="README.md" target="_blank" rel="noreferrer">Concept README</a>
+    </footer>
+
+    <script src="main.js"></script>
+  </body>
+  </html>
