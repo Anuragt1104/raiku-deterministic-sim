@@ -15,7 +15,7 @@ button{cursor:pointer;background:var(--panel);border-color:#293241}
 button:hover{border-color:var(--accent)}
 main{padding:20px 24px;display:grid;gap:24px}
 .metrics{display:flex;gap:18px;flex-wrap:wrap}
-.timeline{display:grid;grid-template-columns:repeat(60, minmax(10px,1fr));gap:4px;padding:12px;background:#0f172a;border:1px solid #1f2937;border-radius:8px}
+.timeline{display:grid;grid-template-columns:repeat(60, minmax(10px,1fr));gap:4px;padding:12px;background:#0f172a;border:1px solid #1f2937;border-radius:8px;overflow:auto}
 .slot{height:60px;border-radius:4px;position:relative;overflow:hidden;background:#0b1320;border:1px solid #0e1a2e}
 .slot .cap{position:absolute;bottom:0;left:0;width:100%;background:linear-gradient(180deg,#1d4ed8,#22d3ee)}
 .slot .ext{position:absolute;top:0;left:0;width:100%;background:#7c3aed22}

@@ -1,6 +1,6 @@
 (() => {
   const SLOT_COUNT = 60;
-  const SLOT_CAPACITY = 48000; // example CUs per slot
+  let slotCapacity = 48000; // user adjustable CUs per slot
   const PRECONF_MS = 30; // Raiku sub-30ms target (visual only)
 
   const el = (id) => document.getElementById(id);
@@ -12,6 +12,14 @@
   const reserveSlotEl = el('reserveSlot');
   const mevSafeEl = el('mevSafe');
   const extLoadEl = el('extLoad');
+  const extLoadPctEl = el('extLoadPct');
+  const slotCapacityEl = el('slotCapacity');
+  const playEl = el('play');
+  const pauseEl = el('pause');
+  const tickMsEl = el('tickMs');
+  const scenarioDexOracleEl = el('scenarioDexOracle');
+  const scenarioHftBurstEl = el('scenarioHftBurst');
+  const exportCsvEl = el('exportCsv');
 
   const currentSlotEl = el('currentSlot');
   const backlogEl = el('backlog');
@@ -71,7 +79,7 @@
   function tryPlace(tx, sIdx) {
     const s = slotAt(sIdx);
     if (!s) return false;
-    const available = SLOT_CAPACITY - (s.used + s.extUsed);
+    const available = slotCapacity - (s.used + s.extUsed);
     if (available >= tx.cu) {
       s.used += tx.cu;
       s.txs.push(tx);
@@ -115,8 +123,9 @@
     if (!extLoadEl.checked) return;
     for (let i = 0; i < SLOT_COUNT; i++) {
       const s = slots[i];
-      // 50% capacity blocked by external congestion
-      const target = Math.floor(SLOT_CAPACITY * 0.5);
+      // configurable % capacity blocked by external congestion
+      const pct = Math.max(0, Math.min(100, Number(extLoadPctEl.value)||50)) / 100;
+      const target = Math.floor(slotCapacity * pct);
       s.extUsed = target;
     }
   }
@@ -146,14 +155,14 @@
       const s = slots[i];
       const elSlot = document.createElement('div');
       elSlot.className = 'slot' + (i === 0 ? ' current' : '');
-      const usedPct = Math.min(100, (s.used / SLOT_CAPACITY) * 100);
-      const extPct = Math.min(100, (s.extUsed / SLOT_CAPACITY) * 100);
+      const usedPct = Math.min(100, (s.used / slotCapacity) * 100);
+      const extPct = Math.min(100, (s.extUsed / slotCapacity) * 100);
       const cap = document.createElement('div'); cap.className = 'cap'; cap.style.height = `${usedPct}%`;
       const ext = document.createElement('div'); ext.className = 'ext'; ext.style.height = `${extPct}%`;
       const label = document.createElement('div'); label.className = 'label'; label.textContent = currentSlot + i;
       elSlot.appendChild(ext); elSlot.appendChild(cap); elSlot.appendChild(label);
       timelineEl.appendChild(elSlot);
-      totalCap += SLOT_CAPACITY; totalUsed += s.used;
+      totalCap += slotCapacity; totalUsed += s.used;
     }
     const fillRate = totalUsed / totalCap;
     fillRateEl.textContent = `${(fillRate*100).toFixed(1)}%`;
@@ -190,6 +199,59 @@
     renderMetrics();
   }
 
+  // scenarios
+  function scenarioDexOracle() {
+    // Clear pending for clarity but keep timeline
+    for (let i=0;i<5;i++) {
+      addTx({ cu: 4000, deadlineFromNow: 15, priority: 'high', group: 'DEX', mode: 'jit', reserveAt: 0 });
+    }
+    for (let i=0;i<5;i++) {
+      addTx({ cu: 3000, deadlineFromNow: 12, priority: 'medium', group: 'ORACLE', mode: 'jit', reserveAt: 0 });
+    }
+    // AOT reservations for DEX settlements
+    addTx({ cu: 6000, deadlineFromNow: 20, priority: 'high', group: 'DEX', mode: 'aot', reserveAt: 5 });
+    addTx({ cu: 6000, deadlineFromNow: 25, priority: 'high', group: 'DEX', mode: 'aot', reserveAt: 10 });
+  }
+
+  function scenarioHftBurst() {
+    // Rapid burst of small JIT orders
+    for (let i=0;i<30;i++) {
+      addTx({ cu: 1000, deadlineFromNow: 6, priority: 'high', group: 'HFT', mode: 'jit', reserveAt: 0 });
+    }
+  }
+
+  // CSV export
+  function exportCsv() {
+    let lines = [];
+    lines.push('type,slot,used,extUsed,capacity');
+    for (let i = 0; i < SLOT_COUNT; i++) {
+      const s = slots[i];
+      const abs = currentSlot + i;
+      lines.push(`slot,${abs},${s.used},${s.extUsed},${slotCapacity}`);
+    }
+    lines.push('type,id,cu,priority,group,createdAt,deadline,scheduledSlot,retries,mode');
+    for (const t of allTxs) {
+      lines.push(`tx,${t.id},${t.cu},${t.priority},${t.group},${t.createdAt},${t.deadline},${t.scheduledSlot??''},${t.retries},${t.mode}`);
+    }
+    const blob = new Blob([lines.join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `raiku-sim-${Date.now()}.csv`;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // auto-advance
+  let timer = null;
+  function play() {
+    const ms = Math.max(50, Number(tickMsEl.value)||500);
+    if (timer) clearInterval(timer);
+    timer = setInterval(advanceOneSlot, ms);
+  }
+  function pause() {
+    if (timer) { clearInterval(timer); timer = null; }
+  }
+
   // wire up controls
   document.getElementById('addTx').onclick = () => {
     addTx({
@@ -216,6 +278,13 @@
   document.getElementById('advance').onclick = advanceOneSlot;
   document.getElementById('reset').onclick = reset;
   extLoadEl.onchange = () => { injectExternalLoad(); render(); };
+  extLoadPctEl.onchange = () => { injectExternalLoad(); render(); };
+  slotCapacityEl.onchange = () => { slotCapacity = Math.max(1000, Number(slotCapacityEl.value)||48000); render(); };
+  playEl.onclick = play;
+  pauseEl.onclick = pause;
+  scenarioDexOracleEl.onclick = scenarioDexOracle;
+  scenarioHftBurstEl.onclick = scenarioHftBurst;
+  exportCsvEl.onclick = exportCsv;
 
   // bootstrap
   initSlots();

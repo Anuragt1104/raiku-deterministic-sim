@@ -25,6 +25,10 @@
         <input id="cu" type="number" min="100" step="100" value="2000" />
       </div>
       <div class="control-group">
+        <label>Slot Capacity (CUs)</label>
+        <input id="slotCapacity" type="number" min="1000" step="1000" value="48000" />
+      </div>
+      <div class="control-group">
         <label>Deadline (slots from now)</label>
         <input id="deadline" type="number" min="1" value="10" />
       </div>
@@ -52,7 +56,18 @@
       </div>
       <div class="control-group toggles">
         <label><input type="checkbox" id="mevSafe" checked /> MEV-safe group ordering</label>
-        <label><input type="checkbox" id="extLoad" /> External congestion (fill 50% each slot)</label>
+        <label><input type="checkbox" id="extLoad" /> External congestion</label>
+        <label>Load % <input id="extLoadPct" type="number" min="0" max="100" value="50" style="width:70px" /> </label>
+      </div>
+      <div class="control-group">
+        <button id="play">Play</button>
+        <button id="pause">Pause</button>
+        <label>Speed ms <input id="tickMs" type="number" min="50" step="50" value="500" style="width:90px" /></label>
+      </div>
+      <div class="control-group">
+        <button id="scenarioDexOracle">Scenario: DEX vs ORACLE</button>
+        <button id="scenarioHftBurst">Scenario: HFT Burst</button>
+        <button id="exportCsv">Export CSV</button>
       </div>
     </section>
 

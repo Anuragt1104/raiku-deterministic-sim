@@ -22,6 +22,12 @@ This simulator lets builders “feel” those guarantees, compare AOT vs JIT sch
 - Metrics: pre‑confirmation latency, fill rate, backlog, slot revenue proxy
 - Scenarios: low‑load, burst, adversarial congestion
 
+Extras:
+- Slot capacity and external load (%) controls
+- Auto‑advance (play/pause) with tick speed
+- Preset scenarios: DEX vs ORACLE, HFT Burst
+- CSV export (timeline + transactions)
+
 No SDK required; all logic is client‑side. Swap the scheduling shim for Raiku’s SDK when available.
 
 ## How to run
