@@ -204,62 +204,6 @@ const inclusion = await raiku.requestJIT({
 
 ---
 
-## 🚀 The Implementation
-
-### Design Principles:
-
-**1. Zero Friction**
-- No dependencies, no build, no setup
-- Open `index.html` → Instant gratification
-
-**2. Visual Storytelling**
-- Gradients, animations, hover tooltips
-- Status icons (✓⏳⟲) for immediate comprehension
-- Color psychology (green=good, red=congestion)
-
-**3. Preset Scenarios**
-- "DEX vs ORACLE" → Group ordering
-- "HFT Burst" → Congestion handling
-- 30 seconds to understanding
-
-**4. Production Quality**
-- Professional UI worthy of Raiku's vision
-- Clean, commented code for judge review
-- Extensible architecture for SDK integration
-
----
-
-## 📊 Use Cases Unlocked
-
-### 1. **Perpetual DEX** (Finance Track)
-```
-Problem: Order matching vulnerable to MEV
-Raiku Solution: AOT reserves + group ordering = Zero MEV
-Simulation: Shows exact slot placement, order preservation
-```
-
-### 2. **HFT Trading** (Finance Track)
-```
-Problem: Execution uncertainty kills alpha
-Raiku Solution: JIT with sub-30ms pre-confirmations
-Simulation: Demonstrates retry logic, deadline handling
-```
-
-### 3. **Validator Analytics** (Tooling Track)
-```
-Problem: No visibility into slot revenue
-Raiku Solution: Timeline visualization + CSV export
-Simulation: Real-time capacity monitoring, data export
-```
-
-### 4. **Economic Research** (Research Track)
-```
-Problem: Need data for fee market modeling
-Raiku Solution: Export slot utilization time-series
-Simulation: CSV with tx metadata for analysis
-```
-
----
 
 ## 🎨 The Visual Experience
 
@@ -292,28 +236,10 @@ Simulation: CSV with tx metadata for analysis
 └──────────────┴──────────────┴──────────────┴──────────────┴──────────────┘
 ```
 
-**Every element tells the story of deterministic execution.**
+
 
 ---
 
-## 💎 The Differentiator
-
-### Other Approaches:
-- ❌ Written documentation (static, boring)
-- ❌ Code examples (abstract, complex)
-- ❌ Verbal explanations (forgettable)
-
-### This Simulator:
-- ✅ **Interactive** → Learn by doing
-- ✅ **Visual** → See the guarantees
-- ✅ **Memorable** → "Aha!" moments stick
-- ✅ **Shareable** → Link in tweets, docs, demos
-
-**When someone asks "What does Raiku do?"**  
-→ Send them this simulator  
-→ 30 seconds later, they understand
-
----
 
 ## 🌟 The Vision Forward
 
@@ -335,36 +261,8 @@ Simulation: CSV with tx metadata for analysis
 
 ---
 
-## 🎯 Success Metrics
 
-**If this simulator achieves its goal, developers will:**
 
-1. **Understand** deterministic execution in < 60 seconds
-2. **Visualize** the difference between AOT and JIT
-3. **Feel confident** building on Raiku's guarantees
-4. **Share** the tool with their teams
-5. **Adopt** Raiku SDK when it launches
-
-**The ultimate success:**  
-*"I didn't get Raiku until I saw the simulator."*
-
----
-
-## 🚀 Why This Wins
-
-### Creativity & Originality
-Not just a dashboard—an **interactive story** that makes abstract concepts tangible through visual storytelling.
-
-### Relevance to Raiku
-Every pixel maps to Raiku's core primitives. This isn't a generic blockchain tool; it's **Raiku-specific education**.
-
-### Feasibility & Clarity
-Zero dependencies. Open `index.html` and experience execution guarantees immediately. Code is production-quality and extensible.
-
-### Presentation Quality
-Professional-grade UI with gradients, animations, tooltips, and responsive design. **Worthy of Raiku's vision.**
-
----
 
 ## 💬 In One Sentence
 
@@ -377,7 +275,7 @@ Professional-grade UI with gradients, animations, tooltips, and responsive desig
 This tool exists to **amplify your vision**.
 
 You're building the infrastructure for deterministic execution.  
-This simulator helps the world **understand why that matters**.
+This simulator helps the people **understand why that matters**.
 
 When execution is guaranteed, everything changes:
 - DeFi protocols eliminate MEV
@@ -390,7 +288,5 @@ When execution is guaranteed, everything changes:
 
 ---
 
-Built with ☕, determinism, and a belief that execution should be guaranteed.
 
-**→ Open `index.html` and experience the future of Solana.**
 
