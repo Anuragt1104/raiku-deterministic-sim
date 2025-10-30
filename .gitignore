@@ -1,6 +1,23 @@
-# Node & tooling (not used, but safe defaults)
-node_modules/
+# macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+*.tmp
+.cache/
+
+# Environment variables (if needed in future)
 .env
-dist/
-build/
+.env.local
