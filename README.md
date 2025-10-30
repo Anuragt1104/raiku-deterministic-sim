@@ -1,62 +1,174 @@
-# Raiku Deterministic Slot Orchestrator — Interactive Simulator
+#  Raiku Deterministic Slot Orchestrator
+### Interactive Visual Simulator
 
-A lightweight, static web prototype that makes Raiku’s deterministic execution tangible. It visualizes Ahead‑Of‑Time (AOT) and Just‑In‑Time (JIT) slot reservations, application‑defined ordering, and Ackermann‑style automated retries under congestion.
 
-## Why this matters
+> **Track 4** (Visual Simulations & Blueprints) | **Track 2** (Open-Source Tooling)
 
-Solana is fast, but execution timing is uncertain under stress. Raiku introduces deterministic execution with:
-- AOT reservations (book blockspace up to ~60s ahead)
-- JIT reservations (buy just‑in‑time inclusion)
-- Transaction‑level guarantees and pre‑confirmations (sub‑30ms targets)
-- Retry offload to the Raiku Ackermann Node
+[![Open in Browser](https://img.shields.io/badge/Demo-Open%20index.html-22d3ee?style=for-the-badge)](./index.html)
 
-This simulator lets builders “feel” those guarantees, compare AOT vs JIT scheduling, and see how app‑defined ordering eliminates opaque auctions and MEV from matching logic.
+---
 
-## What’s inside
 
-- Visual timeline of slots with capacity and utilization
-- Queue of transactions with attributes: compute units, deadline, priority, ordering group
-- Two schedulers:
-  - AOT: reserves future slots deterministically
-  - JIT: allocates into the nearest viable slot; if full, auto‑retry to next slot
-- Metrics: pre‑confirmation latency, fill rate, backlog, slot revenue proxy
-- Scenarios: low‑load, burst, adversarial congestion
+---
 
-Extras:
-- Slot capacity and external load (%) controls
-- Auto‑advance (play/pause) with tick speed
-- Preset scenarios: DEX vs ORACLE, HFT Burst
-- CSV export (timeline + transactions)
+##  Quick Start (30 Seconds)
 
-No SDK required; all logic is client‑side. Swap the scheduling shim for Raiku’s SDK when available.
+1. **Open** `index.html` in your browser (no build required!)
+2. **Click** "Scenario: DEX vs ORACLE" to load a pre-built demo
+3. **Enable** "External congestion" to simulate network stress
+4. **Press** "Play" and watch deterministic scheduling in action
+5. **Hover** over timeline slots to see detailed utilization stats
 
-## How to run
 
-Open `index.html` in a browser. No build or deps.
 
-## Simulator model (simplified)
+---
 
-- Time is discrete in “slots” (e.g., 60 visible). Each slot has capacity (CUs).
-- Transactions: `{id, computeUnits, priority, deadline, group}`
-- AOT: When you reserve, we mark the chosen slot(s) and deduct capacity.
-- JIT: We place the tx in the earliest slot that satisfies capacity and deadline. If none, Ackermann auto‑retries forward until success or expiry.
-- App‑defined ordering: Within a group, order is preserved before cross‑group priority.
+## 🎯 What Problem Does This Solve?
 
-## Demo flow (suggested)
+### The Challenge
+Solana is blazingly fast, but **execution timing is uncertain** under congestion. Builders can't guarantee when—or if—their transactions will land. This blocks institutional adoption and creates MEV opportunities.
 
-1. Add 10 orders in a “Perp DEX” group; reserve AOT slots for the next 3 intervals.
-2. Inject a burst of external load to congest the near‑term slots.
-3. Observe: AOT orders still land deterministically; JIT orders slide forward with auto‑retries.
-4. Toggle “MEV‑safe matching” to enforce group‑preserving order over fee auctions.
-5. Review metrics: utilization, pre‑conf latency, retries.
+### The Raiku Solution
+**Deterministic execution** through:
+- **AOT (Ahead-of-Time) Reservations**: Reserve blockspace 30-60 seconds ahead
+- **JIT (Just-in-Time) Reservations**: Buy immediate inclusion with guarantees
+- **Transaction-level Pre-confirmations**: Sub-30ms targets
+- **Ackermann Node**: Automatic retry orchestration
 
-## Extending toward Raiku
+### This Simulator
+Makes these abstractions **concrete and visual**. See exactly how:
+- AOT reservations lock in future slots deterministically
+- JIT orders navigate congestion with automatic retries
+- App-defined ordering eliminates opaque fee auctions
+- Congestion scenarios affect execution differently
 
-Replace `scheduler.js` shims with Raiku SDK calls:
-- AOT: `reserve(slot, cuBudget, meta)` → reservation ticket
-- JIT: `request(now, constraints)` → inclusion guarantee
-- Ackermann: automatic retry & pre‑confirmation stream
+---
 
-## Notes
 
-This is a conceptual tool for Tracks 2 (Tooling) and 4 (Visualization). It can support Track 1 (Finance) by adding DEX‑specific matchers and Track 3 (Economic Research) by exporting slot/fee time‑series for modeling.
+
+##  How It Works (Simplified)
+
+### Core Model
+```
+Time = Discrete slots (e.g., 60 visible)
+Each slot has capacity in Compute Units (CUs)
+Transactions: { id, CU, priority, deadline, group }
+```
+
+### AOT Scheduling
+```javascript
+reserve(targetSlot) → mark slot, deduct capacity
+If full → try next slot until deadline
+Success → deterministic placement guaranteed
+```
+
+### JIT Scheduling
+```javascript
+request(now, constraints) → find earliest viable slot
+If none → Ackermann auto-retries forward
+Success → placement with minimal latency
+```
+
+### App-Defined Ordering
+```javascript
+Within group → preserve order (MEV-safe)
+Across groups → priority-based placement
+No opaque auctions → transparent scheduling
+```
+
+---
+
+
+
+##  Extending for Raiku SDK
+
+When Raiku's SDK launches, replace the scheduling logic:
+
+```javascript
+// Current (simulation)
+function scheduleAOT(tx, targetSlot) { /* ... */ }
+
+// Future (Raiku SDK)
+async function scheduleAOT(tx, targetSlot) {
+  const reservation = await raiku.reserve({
+    slot: targetSlot,
+    cuBudget: tx.cu,
+    metadata: { group: tx.group, priority: tx.priority }
+  });
+  return reservation.ticket;
+}
+```
+
+Similarly for JIT:
+```javascript
+const inclusion = await raiku.requestJIT({
+  transaction: tx,
+  deadline: tx.deadline,
+  constraints: { minSlot: currentSlot, maxRetries: 5 }
+});
+```
+
+---
+
+##  Use Cases Demonstrated
+
+### 1. Perpetual DEX (Track 1: Finance)
+- **Problem**: Order matching vulnerable to MEV
+- **Solution**: AOT reservations + group ordering = zero MEV
+- **Demo**: "DEX vs ORACLE" scenario
+
+### 2. HFT Trading (Track 1: Finance)
+- **Problem**: Execution uncertainty kills alpha
+- **Solution**: JIT with sub-30ms pre-confirmations
+- **Demo**: "HFT Burst" scenario + external congestion
+
+### 3. Validator Analytics (Track 2: Tooling)
+- **Problem**: No visibility into slot revenue or utilization
+- **Solution**: Timeline visualization + CSV export
+- **Demo**: Export data → analyze in spreadsheet/Python
+
+### 4. Economic Research (Track 3: Research)
+- **Problem**: Need data for local fee market modeling
+- **Solution**: Export slot/tx data for simulations
+- **Demo**: CSV contains timeline + transaction metadata
+
+---
+
+##  Technical Stack
+
+- **Frontend**: Pure HTML/CSS/JavaScript (no dependencies!)
+- **Styling**: Custom CSS with CSS variables for theming
+- **Architecture**: IIFE module pattern, functional + stateful
+- **Data Export**: CSV generation with Blob API
+- **Animations**: CSS transitions + keyframe animations
+- **Responsive**: Flexbox + Grid layout
+
+
+
+
+---
+
+##  Future Enhancements (Post-Hackathon)
+
+-  Integrate real Raiku SDK when available
+-  Add multi-validator simulation (decentralization view)
+-  3D timeline visualization with WebGL
+-  Real-time Solana mainnet data feed
+-  Advanced economic modeling (priority fee dynamics)
+-  Mobile-first redesign for broader accessibility
+-  Embed in Raiku docs as interactive tutorial
+
+---
+
+**Built with** ☕ and determinism.
+
+---
+
+## 📄 License
+
+MIT License - Open source for the community
+
+---
+
+**Ready to experience deterministic execution?**  
+→ Open `index.html` and see Raiku's vision come to life ✨
